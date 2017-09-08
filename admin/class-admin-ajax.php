@@ -26,10 +26,13 @@ class Admin_Ajax {
 			if ( ! empty( $_POST ) ) {
 
 				$wp_amp_themes_options = new Options();
+				error_log($_POST['wp_amp_themes_settings_analyticsid']);
 
 				if ( isset( $_POST['wp_amp_themes_settings_analyticsid'] ) &&
-					isset( $_POST['wp_amp_themes_settings_facebookappid'] ) &&
-					( $_POST['wp_amp_themes_settings_facebookappid'] == '' || is_numeric($_POST['wp_amp_themes_settings_facebookappid']) ) ) {
+				isset( $_POST['wp_amp_themes_settings_facebookappid'] ) &&
+				isset( $_POST['wp_amp_themes_settings_pushdomain'] ) &&
+				( $_POST['wp_amp_themes_settings_facebookappid'] == '' || is_numeric($_POST['wp_amp_themes_settings_facebookappid']) ) &&
+				( $_POST['wp_amp_themes_settings_pushdomain'] = '' || filter_var($_POST['wp_amp_themes_settings_pushdomain'], FILTER_VALIDATE_URL) ) ) {
 
 					// save analytics id
 					$new_analytics_id = sanitize_text_field( $_POST['wp_amp_themes_settings_analyticsid'] );
@@ -47,6 +50,15 @@ class Admin_Ajax {
 
 						$changed = 1;
 						$wp_amp_themes_options->update_settings( 'facebook_app_id', $new_facebook_app_id );
+					}
+
+					// save push domain
+					$new_push_domain = sanitize_text_field( $_POST['wp_amp_themes_settings_pushdomain']);
+
+					if ( $new_push_domain !== $wp_amp_themes_options->get_setting( 'push_domain' ) ) {
+
+						$changed = 1;
+						$wp_amp_themes_options->update_settings( 'push_domain', $new_push_domain );
 					}
 
 					if ( $changed ) {
