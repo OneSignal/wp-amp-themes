@@ -4,6 +4,8 @@ namespace WP_AMP_Themes\Frontend;
 
 use \WP_AMP_Themes\Includes\Options;
 
+require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
 /**
  * Frontend_Init class for initializing the admin area of the WP AMP Themes plugin.
  *
@@ -39,7 +41,14 @@ class Frontend_Init {
 
 		}
 
+		if ( $wp_amp_themes_options->get_setting( 'push_notifications_enabled' ) && is_plugin_active( 'onesignal-free-web-push-notifications/onesignal.php' ) ) {
+
+			add_filter( 'amp_content_sanitizers', [ $this, 'add_sanitizer' ], 10, 2 );
+
+		}
+
 	}
+
 
 	/**
 	 * Callback for loading the custom template together with its parts.
@@ -94,6 +103,38 @@ class Frontend_Init {
 		return $embed_handler_classes;
 	}
 
+
+
+	public function add_sanitizer() {
+
+		$one_signal_options = get_option( 'OneSignalWPSetting' );
+
+		$inject = false;
+
+		if ( isset( $one_signal_options['is_site_https'] ) &&
+			 isset( $one_signal_options['app_id'] ) &&
+			 '' !== $one_signal_options['app_id'] ) {
+
+				$wp_amp_themes_options = new \WP_AMP_Themes\Includes\Options();
+
+				$has_options_http = false == $one_signal_options['is_site_https'] &&
+								isset( $one_signal_options['subdomain'] ) &&
+								'' !== $one_signal_options['subdomain'];
+
+				$has_options_https = true == $one_signal_options['is_site_https'] &&
+								'' !== $wp_amp_themes_options->get_setting( 'push_domain' );
+
+				if ( $has_options_http || $has_options_https ) {
+
+					require_once( dirname( __FILE__ ) . '/class-push-notification-injection-sanitizer.php' );
+					$sanitizer_classes[ 'WAT_Push_Notification_Injection_Sanitizer' ] = $one_signal_options;
+
+					return $sanitizer_classes;
+				}
+		}
+
+		return $sanitizer_classes;
+	}
 
 	/**
 	 * Add Google Analytics ID to the template.
