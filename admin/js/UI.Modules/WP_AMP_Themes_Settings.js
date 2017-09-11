@@ -75,9 +75,7 @@ function WP_AMP_THEMES_SETTINGS() {
       errorElement: 'span'
     });
 
-
-
-    jQuery('#wp_amp_settings_push_enabled_check',JSObject.DOMDoc).change(function() {
+    jQuery('#wp_amp_themes_settings_push_enabled_check',JSObject.DOMDoc).change(function() {
 
       // set the value on the dummy text field that will always be visible in the post data
       if (this.checked) {
