@@ -18,6 +18,35 @@ class WAT_Push_Notification_Injection_Sanitizer extends AMP_Base_Sanitizer {
 
 		$body = $this->get_body_node();
 
+		$push_div_node = AMP_DOM_Utils::create_node( $this->dom, 'div', [
+			'class' => 'web-push',
+		]);
+
+
+		if ( $this->args['is_site_https'] == false ) {
+
+			$helper_url = 'https://' . $this->args['subdomain'] . '.os.tc/amp/helper_frame?appId=' . $this->args['app_id'];
+			$dialog_url = 'https://' . $this->args['subdomain'] . '.os.tc/amp/permission_dialog?appId=' . $this->args['app_id'];
+			$worker_url = 'https://' . $this->args['subdomain'] . '.os.tc/OneSignalSDKWorker.js?appId=' . $this->args['app_id'];
+
+		} else {
+
+			$wp_amp_themes_options = new \WP_AMP_Themes\Includes\Options();
+			$domain = $wp_amp_themes_options->get_setting( 'push_domain' );
+
+			$helper_url = $domain . '/amp-helper-frame.html?appId=' . $this->args['app_id'];
+			$dialog_url = $domain . '/amp-permission-dialog.html?appId=' . $this->args['app_id'];
+			$worker_url = $worker_url . '/OneSignalSDKWorker.js?appId=' . $this->args['app_id'];
+		}
+
+		$web_push_node = AMP_DOM_Utils::create_node( $this->dom, 'amp-web-push', [
+			'id' => 'amp-web-push',
+			'layout' => 'nodisplay',
+			'helper-iframe-url' => $helper_url,
+			'permission-dialog-url' => $dialog_url,
+			'service-worker-url' => $worker_url,
+		] );
+
 		$subscribe_widget_node = AMP_DOM_Utils::create_node( $this->dom, 'amp-web-push-widget', [
 			'visibility' => 'unsubscribed',
 			'layout' => 'fixed',
@@ -60,33 +89,12 @@ class WAT_Push_Notification_Injection_Sanitizer extends AMP_Base_Sanitizer {
 		$unsubscribe_widget_node->appendChild( $unsubscribe_button_node );
 
 
-		if ( $this->args['is_site_https'] == false ) {
+		$push_div_node->appendChild( $web_push_node );
+		$push_div_node->appendChild( $subscribe_widget_node );
+		$push_div_node->appendChild( $unsubscribe_widget_node );
 
-			$helper_url = 'https://' . $this->args['subdomain'] . '.os.tc/amp/helper_frame?appId=' . $this->args['app_id'];
-			$dialog_url = 'https://' . $this->args['subdomain'] . '.os.tc/amp/permission_dialog?appId=' . $this->args['app_id'];
-			$worker_url = 'https://' . $this->args['subdomain'] . '.os.tc/OneSignalSDKWorker.js?appId=' . $this->args['app_id'];
-
-		} else {
-
-			$wp_amp_themes_options = new \WP_AMP_Themes\Includes\Options();
-			$domain = $wp_amp_themes_options->get_setting( 'push_domain' );
-
-			$helper_url = $domain . '/amp-helper-frame.html?appId=' . $this->args['app_id'];
-			$dialog_url = $domain . '/amp-permission-dialog.html?appId=' . $this->args['app_id'];
-			$worker_url = $worker_url . '/OneSignalSDKWorker.js?appId=' . $this->args['app_id'];
-		}
-
-		$web_push_node = AMP_DOM_Utils::create_node( $this->dom, 'amp-web-push', [
-			'id' => 'amp-web-push',
-			'layout' => 'nodisplay',
-			'helper-iframe-url' => $helper_url,
-			'permission-dialog-url' => $dialog_url,
-			'service-worker-url' => $worker_url,
-		] );
-
-		$body->appendChild( $web_push_node );
-		$body->appendChild( $subscribe_widget_node );
-		$body->appendChild( $unsubscribe_widget_node );
+		$social_node = $body->getElementsByTagName( 'amp-social-share' );
+		$body->insertBefore( $push_div_node, $social_node->item(0)->parentNode );
 
 	}
 }

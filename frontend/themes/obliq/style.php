@@ -968,6 +968,10 @@ amp-social-share {
 
 <?php if ( $wp_amp_themes_options->get_setting( 'push_notifications_enabled' ) ) : ?>
 
+	.web-push {
+		margin-top: 16px;
+	}
+
 	amp-web-push-widget button.subscribe {
 				display: inline-flex;
 				align-items: center;
