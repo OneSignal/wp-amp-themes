@@ -110,7 +110,7 @@ class Admin_Init {
 
 				return;
 
-			} elseif ( '' != $wp_amp_themes_options->get_setting( 'push_domain' ) ) {
+			} elseif ( '' == $wp_amp_themes_options->get_setting( 'push_domain' ) ) {
 
 				echo $this->build_message( 'domain', 'AMP Themes');
 
