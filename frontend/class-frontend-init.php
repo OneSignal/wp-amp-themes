@@ -28,6 +28,8 @@ class Frontend_Init {
 
 		$wp_amp_themes_options = new Options();
 
+		add_filter( 'amp_post_template_metadata', [ $this, 'add_logo_and_image_meta' ], 10, 2 );
+
 		if ( $wp_amp_themes_options->get_setting( 'theme' ) !== 'default' ) {
 
 			add_filter( 'amp_post_template_file', [ $this, 'set_wp_amp_theme_template' ], 10, 3 );
@@ -46,6 +48,35 @@ class Frontend_Init {
 			add_filter( 'amp_content_sanitizers', [ $this, 'add_sanitizer' ], 10, 2 );
 
 		}
+
+	}
+
+	/**
+	 * Callback for adding logo and image metadata to the schema
+	 */
+	public function add_logo_and_image_meta( $metadata, $post ) {
+
+		$wp_amp_themes_options = new Options();
+		$customizer_settings = $wp_amp_themes_options->get_setting( 'customize' );
+
+		if ( has_post_thumbnail( $post->ID ) ) {
+
+			$metadata['image'] = [
+				'@type' => 'ImageObject',
+				'url' => get_the_post_thumbnail_url( $post->ID ),
+			];
+
+		}
+
+		if ( [] != $customizer_settings && isset( $customizer_settings['logo'] ) && '' != $customizer_settings['logo'] ) {
+
+			$metadata['publisher']['logo'] = [
+				'@type' => 'ImageObject',
+				'url' => $customizer_settings['logo'],
+			];
+		}
+
+		return $metadata;
 
 	}
 
@@ -104,7 +135,9 @@ class Frontend_Init {
 	}
 
 
-
+	/**
+	 * Callback for adding push html elemenets and scripts
+	 */
 	public function add_sanitizer() {
 
 		$one_signal_options = get_option( 'OneSignalWPSetting' );
