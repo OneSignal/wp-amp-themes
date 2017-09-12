@@ -36,7 +36,7 @@ class WAT_Push_Notification_Injection_Sanitizer extends AMP_Base_Sanitizer {
 
 			$helper_url = $domain . '/amp-helper-frame.html?appId=' . $this->args['app_id'];
 			$dialog_url = $domain . '/amp-permission-dialog.html?appId=' . $this->args['app_id'];
-			$worker_url = $worker_url . '/OneSignalSDKWorker.js?appId=' . $this->args['app_id'];
+			$worker_url = $domain . '/OneSignalSDKWorker.js?appId=' . $this->args['app_id'];
 		}
 
 		$web_push_node = AMP_DOM_Utils::create_node( $this->dom, 'amp-web-push', [
