@@ -16,6 +16,7 @@ class WAT_Push_Notification_Injection_Sanitizer extends AMP_Base_Sanitizer {
 
 	public function sanitize() {
 
+		$wp_amp_themes_options = new \WP_AMP_Themes\Includes\Options();
 		$body = $this->get_body_node();
 
 		$push_div_node = AMP_DOM_Utils::create_node( $this->dom, 'div', [
@@ -31,7 +32,6 @@ class WAT_Push_Notification_Injection_Sanitizer extends AMP_Base_Sanitizer {
 
 		} else {
 
-			$wp_amp_themes_options = new \WP_AMP_Themes\Includes\Options();
 			$domain = $wp_amp_themes_options->get_setting( 'push_domain' );
 
 			$helper_url = $domain . '/amp-helper-frame.html?appId=' . $this->args['app_id'];
@@ -93,8 +93,16 @@ class WAT_Push_Notification_Injection_Sanitizer extends AMP_Base_Sanitizer {
 		$push_div_node->appendChild( $subscribe_widget_node );
 		$push_div_node->appendChild( $unsubscribe_widget_node );
 
-		$social_node = $body->getElementsByTagName( 'amp-social-share' );
-		$body->insertBefore( $push_div_node, $social_node->item(0)->parentNode );
 
+		if ( 'default' == $wp_amp_themes_options->get_setting( 'theme' ) ) {
+
+			$body->appendChild( $push_div_node );
+
+		} else {
+
+			$social_node = $body->getElementsByTagName( 'amp-social-share' );
+			$body->insertBefore( $push_div_node, $social_node->item(0)->parentNode );
+
+		}
 	}
 }

@@ -27,17 +27,18 @@ class Frontend_Init {
 	public function integrate_template() {
 
 		$wp_amp_themes_options = new Options();
+		$theme = $wp_amp_themes_options->get_setting( 'theme' );
 
 		add_filter( 'amp_post_template_metadata', [ $this, 'add_logo_and_image_meta' ], 10, 2 );
 
-		if ( $wp_amp_themes_options->get_setting( 'theme' ) !== 'default' ) {
+		if ( 'default' !== $theme ) {
 
 			add_filter( 'amp_post_template_file', [ $this, 'set_wp_amp_theme_template' ], 10, 3 );
 			add_filter( 'amp_content_embed_handlers', [ $this, 'set_wp_amp_post_social_embed' ], 10, 2 );
 		}
 
 
-		if ( $wp_amp_themes_options->get_setting( 'analytics_id' ) !== '' ) {
+		if ( '' !== $wp_amp_themes_options->get_setting( 'analytics_id' ) ) {
 
 			add_filter( 'amp_post_template_analytics', [ $this, 'add_analytics' ] );
 
@@ -47,6 +48,10 @@ class Frontend_Init {
 
 			add_filter( 'amp_content_sanitizers', [ $this, 'add_sanitizer' ], 10, 2 );
 
+			if ( 'default' == $theme ) {
+
+				add_action( 'amp_post_template_css', [ $this, 'add_push_styles' ] );
+			}
 		}
 
 	}
@@ -138,7 +143,7 @@ class Frontend_Init {
 	/**
 	 * Callback for adding push html elemenets and scripts
 	 */
-	public function add_sanitizer() {
+	public function add_sanitizer( $sanitizer_classes, $post ) {
 
 		$one_signal_options = get_option( 'OneSignalWPSetting' );
 
@@ -204,5 +209,56 @@ class Frontend_Init {
 	}
 
 
+	/**
+	 * Add push notification button style for default theme.
+	 */
+	 public function add_push_styles( $amp_template ) {
+		?>
+		.web-push {
+		margin-top: 16px;
+		}
 
+		amp-web-push-widget button.subscribe {
+					display: inline-flex;
+					align-items: center;
+					border-radius: 2px;
+					border: 0;
+					box-sizing: border-box;
+					margin: 0;
+					padding: 10px 15px;
+					cursor: pointer;
+					outline: none;
+					font-size: 15px;
+					font-weight: 400;
+					background: #4A90E2;
+					color: white;
+					box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.5);
+					-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+		}
+
+		amp-web-push-widget button.subscribe .subscribe-icon {
+			margin-right: 10px;
+		}
+
+		amp-web-push-widget button.subscribe:active {
+			transform: scale(0.99);
+		}
+
+		amp-web-push-widget button.unsubscribe {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			height: 45px;
+			border: 0;
+			margin: 0;
+			cursor: pointer;
+			outline: none;
+			font-size: 15px;
+			font-weight: 400;
+			background: transparent;
+			color: #B1B1B1;
+			-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+		}
+		<?php
+	 }
 }
