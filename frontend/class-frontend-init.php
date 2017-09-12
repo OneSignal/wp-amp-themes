@@ -149,7 +149,9 @@ class Frontend_Init {
 
 		$inject = false;
 
-		if ( isset( $one_signal_options['is_site_https'] ) &&
+		if ( $one_signal_options &&
+			 is_array( $one_signal_options ) &&
+			 isset( $one_signal_options['is_site_https'] ) &&
 			 isset( $one_signal_options['app_id'] ) &&
 			 '' !== $one_signal_options['app_id'] ) {
 
