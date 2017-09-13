@@ -112,7 +112,7 @@ $installed_themes = $wp_amp_themes_options->get_setting( 'installed_themes' );
 				</input> <br/>
 				<p class="field-message error" id="error_pushdomain_container"></p>
 				<div class="spacer-10"></div>
-				<input type="hidden" name="wp_amp_themes_settings_push_enabled" id="wp_amp_themes_settings_push_enabled" value="<?php echo $push_notifications_enabled;?>" />
+				<input type="hidden" name="wp_amp_themes_settings_push_enabled" id="wp_amp_themes_settings_push_enabled" value="<?php echo esc_attr($push_notifications_enabled);?>" />
 				<input type="checkbox" name="wp_amp_themes_settings_push_enabled_check" id="wp_amp_themes_settings_push_enabled_check" value="0" <?php if ($push_notifications_enabled == 1) echo "checked" ;?> />
 				<label for ="wp_amp_themes_settings_push_enabled_check">Display push notifications on AMP pages via the OneSignal plugin</label>
 				<div class="spacer-30"></div>
